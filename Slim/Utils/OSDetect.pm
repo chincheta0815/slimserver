@@ -24,7 +24,7 @@ L<Slim::Utils::OSDetect> handles Operating System Specific details.
 use strict;
 use FindBin qw($Bin);
 
-my ($os, $isWindows, $isMac, $isLinux);
+my ($os, $isWindows, $isMac, $isLinux, $isSolaris);
 
 =head1 METHODS
 
@@ -46,7 +46,7 @@ sub OS {
 
 sub init {
 	my $newBin = shift;
-	
+
 	if ($os) {
 		return;
 	}
@@ -68,8 +68,12 @@ sub init {
 	}
 
 	if (!$os) {		
+		if ($^O =~ /solaris/i) {
 
-		if ($^O =~/darwin/i) {
+                    require Slim::Utils::OS::Solaris;
+                    $os = Slim::Utils::OS::Solaris->new();
+
+                } elsif ($^O =~/darwin/i) {
 			
 			require Slim::Utils::OS::OSX;
 			$os = Slim::Utils::OS::OSX->new();
@@ -132,6 +136,7 @@ sub init {
 	$isWindows = $os->name eq 'win';
 	$isMac     = $os->name eq 'mac';
 	$isLinux   = $os->get('os') eq 'Linux';
+        $isSolaris = $os->get('os') eq 'solaris';
 }
 
 sub getOS {
@@ -190,6 +195,10 @@ sub isMac {
 
 sub isLinux {
 	return $isLinux;
+}
+
+sub isSolaris {
+        return $isSolaris;
 }
 
 1;
